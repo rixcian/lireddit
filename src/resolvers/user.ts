@@ -45,15 +45,33 @@ class UserResponse {
 @Resolver()
 export class UserResolver {
 
-  @Mutation(() => User)
+  @Mutation(() => UserResponse)
   async register(
     @Arg('inputs') { username, email, password }: RegisterInput,
     @Ctx() { em }: MyContext
-  ): Promise<User> {
-    const hashedPassword = await argon2.hash(password);
-    const user = em.create(User, {username, email, password: hashedPassword});
-    await em.persistAndFlush(user);
-    return user;
+  ): Promise<UserResponse> {
+    
+    if (username.length < 3)
+      return {errors: [{ field: 'username', message: "Username has to be at least 3 characters long." }]};
+
+    if (password.length < 8)
+      return {errors: [{ field: 'password', message: "Password has to be at least 8 characters long." }]};
+
+    try {
+      const hashedPassword = await argon2.hash(password);
+      const user = em.create(User, {username, email, password: hashedPassword});
+      
+      await em.persistAndFlush(user);
+      return {user};
+    } catch (e) {
+      console.log(e);
+      switch (parseInt(e.code)) {
+        case 23505:
+          return {errors: [{ field: 'username', message: "User with this username already exist." }]};
+        default:
+          return {errors: [{ field: '', message: "Server Error" }]};
+      }
+    }
   }
 
   @Mutation(() => UserResponse)
@@ -62,15 +80,14 @@ export class UserResolver {
     @Ctx() { em }: MyContext
   ): Promise<UserResponse> {
 
-    if (typeof username === 'undefined')
-      return {errors: [{ field: 'username', message: "Username has to be specified." }]};
-    
-    if (typeof password === 'undefined')
-      return {errors: [{ field: 'password', message: "Password has to be specified." }]};
-    
+    if (username.length < 3)
+      return {errors: [{ field: 'username', message: "Username has to be at least 3 characters long." }]};
+
     const user = await em.findOne(User, {username});
 
-    if (!user) 
+    console.log(user);
+
+    if (!user)
       return {errors: [{ field: 'username', message: "User with this username doesn't exist." }]};
     
     const isPasswordValid = await argon2.verify(user.password, password);
