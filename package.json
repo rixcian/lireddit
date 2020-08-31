@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon dist/index.js",
     "watch": "tsc -w",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "migration:create": "npx mikro-orm migration:create"
   },
   "keywords": [],
   "author": "rixcian <rostislav.kremecek@protonmail.com>",
