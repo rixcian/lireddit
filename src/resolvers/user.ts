@@ -77,7 +77,7 @@ export class UserResolver {
   @Mutation(() => UserResponse)
   async login(
     @Arg('inputs') { username, password }: LoginInput,
-    @Ctx() { em }: MyContext
+    @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
 
     if (username.length < 3)
@@ -94,6 +94,8 @@ export class UserResolver {
 
     if (!isPasswordValid)
       return {errors: [{ field: 'password', message: "Password isn't valid." }]};
+    
+    req.session!.userId = user.id;
     
     return {user};
     
