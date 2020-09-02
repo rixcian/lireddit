@@ -1,4 +1,4 @@
-import { Resolver, Mutation, InputType, Field, Arg, Ctx, ObjectType } from 'type-graphql';
+import { Resolver, Mutation, InputType, Field, Arg, Ctx, ObjectType, Query } from 'type-graphql';
 import { User } from '../entities/User';
 import { MyContext } from 'src/types';
 import argon2 from 'argon2';
@@ -44,6 +44,17 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
+  @Query(() => User, { nullable: true })
+  async me(
+    @Ctx() { em, req }: MyContext
+  ): Promise<User | null> {
+    if (!req.session!.userId) return null;
+    
+    const user = await em.findOne(User, { id: req.session!.userId });
+    if (!user) return null;
+
+    return user;
+  }
 
   @Mutation(() => UserResponse)
   async register(
@@ -95,6 +106,7 @@ export class UserResolver {
     if (!isPasswordValid)
       return {errors: [{ field: 'password', message: "Password isn't valid." }]};
     
+    // store user id into session
     req.session!.userId = user.id;
     
     return {user};

@@ -47,9 +47,9 @@ const main = async () => {
       validate: false
     }),
     context: ({req, res}): MyContext => ({
-      em: orm.em,
       req,
       res,
+      em: orm.em,
     })
   });
 
