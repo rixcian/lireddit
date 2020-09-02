@@ -26,3 +26,6 @@ Install pgAdmin & create lireddit database
 Set credentials to pgAdmin
 - **Email:** postgres@localhost
 - **Password:** postgres
+
+Install Redis
+- https://linuxize.com/post/how-to-install-and-configure-redis-on-ubuntu-20-04/
