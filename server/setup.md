@@ -12,7 +12,7 @@ which will watching all the ts files and automatically recompiles it.
 - `"watch": "tsc -w"`
 
 Add "dev" script into package.json file
-- `"dev": "nodemon dist/index.js"`
+- `"dev": "nodemon dist/index.tsx"`
 
 Install and setup postgresql
 - https://linuxize.com/post/how-to-install-postgresql-on-ubuntu-20-04/
