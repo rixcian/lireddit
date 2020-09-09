@@ -5,19 +5,39 @@ import {Input, FormLabel, FormControl, FormErrorMessage} from "@chakra-ui/core";
 import PageWrapper from '../components/PageWrapper';
 import InputField from "../components/InputField";
 import {Button} from "@chakra-ui/core/dist";
+import { useMutation } from 'urql';
 
 
-interface RegisterProps {
+interface RegisterProps {}
 
+const REGISTER_MUT = `
+mutation Register($username: String!, $email: String!, $password: String!) {
+  register(inputs: {username: $username, email: $email, password: $password}) {
+    user {
+      id,
+      username,
+      email
+    },
+    errors {
+      field,
+      message
+    }
+  }
 }
+`
 
 const Register: React.FC<RegisterProps> = ({}) => {
+
+  const [,register] = useMutation(REGISTER_MUT);
 
   return (
     <PageWrapper variant="regular">
       <Formik
         initialValues={{username: '', email: '', password: ''}}
-        onSubmit={values => console.log(values)}
+        onSubmit={values => {
+          console.log(values);
+          register(values);
+        }}
       >
         {(values, handleChange, isSubmitting) => (
           <Form>
